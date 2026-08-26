@@ -162,9 +162,198 @@ springboot-demo/
 
 ---
 
-## 7. 本项目后续规划（Roadmap）
+## 7. API 接口文档（模板示例）
 
-- [ ] 补充 README 的接口清单（请求参数/返回示例）
+> 以下为学习阶段的文档模板，可按你的实际 controller 路径调整。
+
+### 7.1 登录
+
+- **URL**: `/api/auth/login`
+- **Method**: `POST`
+- **Request Body**:
+
+```json
+{
+  "username": "admin",
+  "password": "123456"
+}
+```
+
+- **Response 示例**:
+
+```json
+{
+  "code": 0,
+  "message": "success",
+  "data": {
+    "token": "jwt-token-demo",
+    "expireAt": "2026-08-26T23:59:59"
+  }
+}
+```
+
+---
+
+### 7.2 查询学生列表
+
+- **URL**: `/api/students`
+- **Method**: `GET`
+- **Query 参数**:
+  - `page` (int, 可选, 默认 1)
+  - `size` (int, 可选, 默认 10)
+  - `name` (string, 可选)
+
+- **Response 示例**:
+
+```json
+{
+  "code": 0,
+  "message": "success",
+  "data": {
+    "total": 2,
+    "records": [
+      {"id": 1, "name": "张三", "age": 20, "gender": "M"},
+      {"id": 2, "name": "李四", "age": 21, "gender": "F"}
+    ]
+  }
+}
+```
+
+---
+
+### 7.3 新增学生
+
+- **URL**: `/api/students`
+- **Method**: `POST`
+- **Request Body**:
+
+```json
+{
+  "name": "王五",
+  "age": 19,
+  "gender": "M",
+  "grade": "大一"
+}
+```
+
+- **Response 示例**:
+
+```json
+{
+  "code": 0,
+  "message": "created",
+  "data": {"id": 3}
+}
+```
+
+---
+
+### 7.4 更新学生
+
+- **URL**: `/api/students/{id}`
+- **Method**: `PUT`
+- **Path 参数**:
+  - `id` (long, 必填)
+- **Request Body**:
+
+```json
+{
+  "name": "王五",
+  "age": 20,
+  "grade": "大二"
+}
+```
+
+---
+
+### 7.5 删除学生
+
+- **URL**: `/api/students/{id}`
+- **Method**: `DELETE`
+- **Path 参数**:
+  - `id` (long, 必填)
+
+---
+
+### 7.6 通用错误码建议
+
+- `0`：成功
+- `4001`：参数错误
+- `4004`：资源不存在
+- `5000`：服务器内部错误
+- `4010`：未授权/登录失效
+
+---
+
+## 8. 项目亮点（简历/面试可讲）
+
+- 从前端视角切入后端开发，完整实践了 API 到数据库的闭环。
+- 强化分层设计：Controller、Service、DAO/Mapper 职责清晰，便于维护。
+- 具备工程化意识：Maven、配置管理、SQL 脚本、README 文档化。
+- 可扩展性良好：可继续平滑扩展课程管理、成绩管理、用户权限模块。
+
+---
+
+## 9. 学习里程碑（可打卡）
+
+### 7 天目标
+
+- [ ] 本地环境完全跑通
+- [ ] 跑通学生模块 CRUD
+- [ ] 明确分层职责并完成一次小重构
+
+### 30 天目标
+
+- [ ] 增加 JWT 或 Session 登录鉴权
+- [ ] 接入 Swagger/OpenAPI
+- [ ] 增加全局异常处理 + 参数校验
+- [ ] 补充基础单元测试
+- [ ] 完成 Docker 本地部署
+
+---
+
+## 10. 开发规范（建议）
+
+### 10.1 分支命名
+
+- `feature/*`：新功能
+- `fix/*`：Bug 修复
+- `docs/*`：文档变更
+- `refactor/*`：重构
+
+### 10.2 Commit 规范
+
+- `feat: ...`
+- `fix: ...`
+- `docs: ...`
+- `refactor: ...`
+- `test: ...`
+
+示例：
+
+- `feat: add student pagination api`
+- `fix: handle null pointer in login service`
+- `docs: update README learning roadmap`
+
+### 10.3 学习记录规范
+
+建议新增目录：`weekly-log/`
+
+- `week-01.md`
+- `week-02.md`
+- `week-03.md`
+
+每周记录：
+
+1. 本周新增功能
+2. 本周遇到问题与排查过程
+3. 下周计划
+
+---
+
+## 11. 本项目后续规划（Roadmap）
+
+- [ ] 补充真实接口清单（与 controller 代码保持一致）
 - [ ] 增加统一响应体与错误码枚举
 - [ ] 增加参数校验与全局异常处理
 - [ ] 接入 Swagger/OpenAPI 文档
@@ -175,17 +364,8 @@ springboot-demo/
 
 ---
 
-## 8. 你可以这样使用这个项目
+## 12. 你可以这样使用这个项目
 
 1. 先当“教程项目”：逐模块阅读 + 注释理解  
 2. 再当“实验项目”：每周做 1 次功能扩展  
 3. 最后当“作品项目”：完善文档后放进简历/面试项目集
-
----
-
-## 9. 给自己的学习要求（可直接打卡）
-
-- 每次新增功能必须走完整链路：Controller → Service → DAO/Mapper → SQL
-- 每个接口至少写清楚：输入、输出、异常场景
-- 每周至少一次重构：减少重复代码、优化命名
-- 每周输出一篇学习记录（遇到的问题 + 解决过程）
