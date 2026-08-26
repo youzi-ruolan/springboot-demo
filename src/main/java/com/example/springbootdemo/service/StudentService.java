@@ -5,6 +5,7 @@ import com.example.springbootdemo.dto.StudentCreateDTO;
 import com.example.springbootdemo.dto.StudentUpdateDTO;
 import com.example.springbootdemo.entity.Student;
 import com.example.springbootdemo.exception.BusinessException;
+import com.example.springbootdemo.mapper.StudentMapper;
 import com.example.springbootdemo.vo.StudentVO;
 import org.springframework.stereotype.Service;
 
@@ -13,18 +14,26 @@ import java.util.List;
 
 @Service
 public class StudentService {
-    private  final List<Student> students = new ArrayList<>();
+    private final StudentMapper studentMapper;
     private Long nextId = 1L;
+
+    public StudentService(StudentMapper studentMapper) {
+        this.studentMapper = studentMapper;
+    }
 
     /**
      * 返回全部的学生信息
      */
     public List<StudentVO> getStudents (){
-        List<StudentVO> allList = new ArrayList<>();
-        for (Student student : students){
-            allList.add(toVo(student));
+        List<Student> students = studentMapper.findAll();
+
+        List<StudentVO> result = new ArrayList<>();
+
+        for (Student student : students) {
+            result.add(toVo(student));
         }
-        return allList;
+
+        return result;
     }
 
     /**
@@ -32,6 +41,7 @@ public class StudentService {
      */
 
     public StudentVO getStudentById(Long id){
+        List<Student> students = studentMapper.findAll();
         for(Student student : students){
             if(student.getId().equals(id)){
                 return  toVo(student);
@@ -45,7 +55,7 @@ public class StudentService {
      */
     public StudentVO createStudent(StudentCreateDTO dto){
         Student student = new Student();
-
+        List<Student> students = studentMapper.findAll();
         student.setId(nextId ++);
         student.setGender(dto.getGender());
         student.setAge(dto.getAge());
@@ -76,6 +86,7 @@ public class StudentService {
 
     public void deleteStudent(Long id){
         Student student = findStudentById(id);
+        List<Student> students = studentMapper.findAll();
         students.remove(student);
     }
 
@@ -96,6 +107,7 @@ public class StudentService {
      * 根据ID查询entity
      */
     public Student findStudentById(Long id){
+        List<Student> students = studentMapper.findAll();
         for (Student student : students) {
 
             if (student.getId().equals(id)) {
