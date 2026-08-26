@@ -1,7 +1,7 @@
 # springboot-demo
 
 一个面向学习的 **Spring Boot 学生信息管理系统**，用于前端开发者系统练习 Java 后端开发流程：  
-从接口设计、数据库连接、业务分层到基础权限与项目工程化。
+从接口设计、数据库连接、业务分层到异常处理与基础工程化。
 
 ---
 
@@ -12,227 +12,145 @@
 
 你可以把它理解为：
 
-- 前端视角：提供学生增删改查、登录/密码相关接口
-- 后端视角：练习 Controller / Service / Mapper 分层、参数校验、异常处理、数据库操作
-- 工程视角：学习 Maven、配置文件、SQL 脚本、基础部署与后续扩展思路
+- 前端视角：消费学生管理接口，完成页面与接口联调
+- 后端视角：练习 Controller / Service / Mapper 分层与 DTO-VO 模型转换
+- 工程视角：掌握 Maven、配置文件、异常统一返回与 SQL 脚本协作
 
 ---
 
-## 2. 当前技术栈
+## 2. 当前技术栈（基于仓库代码）
 
 - **语言**：Java（100%）
 - **框架**：Spring Boot
-- **构建工具**：Maven（含 `mvnw` / `mvnw.cmd`）
+- **数据访问**：MyBatis Mapper（`StudentMapper`）
+- **构建工具**：Maven（`mvnw` / `mvnw.cmd`）
 - **配置文件**：`application.properties`
-- **数据库相关**：SQL 脚本（如 `reset_pass.sql`）
+- **异常处理**：`@RestControllerAdvice` + `BusinessException`
+- **统一返回**：`Result<T>`
 
 ---
 
-## 3. 目录结构（学习向说明）
+## 3. 项目结构（按真实代码）
 
 ```text
-springboot-demo/
-├─ .mvn/                   # Maven Wrapper 配置
-├─ src/                    # 业务源码（核心学习区）
-├─ pom.xml                 # Maven 依赖与构建配置
-├─ application.properties  # Spring Boot 配置（端口、数据源等）
-├─ reset_pass.sql          # 数据库脚本（密码重置场景）
-├─ mvnw / mvnw.cmd         # 跨平台 Maven 启动脚本
-└─ .gitignore              # Git 忽略规则
+src/main/java/com/example/springbootdemo
+├─ SpringbootDemoApplication.java      # Spring Boot 启动入口
+├─ controller/
+│  └─ StudentController.java           # 学生 CRUD REST 接口
+├─ service/
+│  └─ StudentService.java              # 学生业务逻辑
+├─ mapper/
+│  └─ StudentMapper.java               # 数据访问层接口（MyBatis）
+├─ entity/
+│  └─ Student.java                     # 实体模型
+├─ dto/
+│  ├─ StudentCreateDTO.java            # 创建请求模型
+│  └─ StudentUpdateDTO.java            # 更新请求模型
+├─ vo/
+│  └─ StudentVO.java                   # 返回给前端的视图模型
+├─ common/
+│  └─ Result.java                      # 统一响应结构
+└─ exception/
+   ├─ BusinessException.java           # 业务异常
+   └─ GlobalExceptionHandler.java      # 全局异常处理
 ```
 
----
+此外：
 
-## 4. 这个项目适合练的核心知识点
-
-### 4.1 Java 基础（后端必备）
-
-- 面向对象：类、封装、继承、多态
-- 集合与泛型：List / Map、泛型接口与返回值
-- 异常机制：try-catch、自定义异常、全局异常处理思想
-- 时间与工具类：LocalDateTime、常用字符串处理
-
-### 4.2 Spring Boot 基础
-
-- 启动类与自动装配机制（知道“为什么能跑”）
-- Controller：REST 风格接口设计（GET/POST/PUT/DELETE）
-- 参数接收与校验：`@RequestParam` / `@PathVariable` / `@RequestBody`
-- 配置管理：`application.properties` 多环境意识（dev/test/prod）
-
-### 4.3 分层架构思维（重点）
-
-- Controller：处理请求与响应
-- Service：封装业务逻辑
-- DAO/Mapper：数据库交互
-- Entity/DTO/VO：数据模型分离（逐步规范）
-
-### 4.4 数据库与 SQL
-
-- 表结构设计（学生、用户等）
-- 基础 CRUD SQL
-- 条件查询、分页查询思路
-- 数据初始化与脚本管理（如 `reset_pass.sql`）
-
-### 4.5 工程化能力
-
-- Maven 依赖管理与生命周期
-- Git 提交规范（功能分支、原子提交）
-- 接口文档意识（建议接入 Swagger/OpenAPI）
-- 日志与错误排查基本流程
+- `pom.xml`：依赖管理
+- `application.properties`：应用配置
+- `reset_pass.sql`：数据库辅助脚本
 
 ---
 
-## 5. 学习计划（4 周路线）
+## 4. 系统架构与请求流转（面试可讲）
 
-> 节奏建议：每天 1~2 小时，周末做总结与重构。
+### 4.1 分层架构
 
-### 第 1 周：能跑 + 看懂结构
+- **Controller 层**：接收 HTTP 请求，解析参数，返回 `Result<T>`
+- **Service 层**：封装业务规则（查询、创建、更新、删除）
+- **Mapper 层**：定义数据访问接口（如 `findAll()` / `findById()`）
+- **模型层**：
+  - `DTO`：接收前端请求
+  - `Entity`：内部数据对象
+  - `VO`：返回前端展示对象
 
-目标：
+### 4.2 一次请求如何流转
 
-- 本地成功启动项目
-- 看懂 `pom.xml`、配置文件、启动入口
-- 跑通 1~2 个最基础接口
-
-任务：
-
-- 配置 JDK、Maven 环境
-- 阅读并标注主要包结构（controller/service/mapper/entity）
-- 画一张“请求从前端到数据库再返回”的流程图
-
-### 第 2 周：CRUD + 分层实践
-
-目标：
-
-- 独立完成学生信息的增删改查
-- 理清分层职责，避免 Controller 写业务细节
-
-任务：
-
-- 新增一个业务字段（如年级/班级）并全链路改造
-- 给查询接口加分页参数
-- 统一返回结构（code/message/data）
-
-### 第 3 周：质量提升（异常、校验、日志）
-
-目标：
-
-- 让接口“可用”变“好用”
-- 出错时有统一、可读的错误响应
-
-任务：
-
-- 增加参数校验（不能为空、长度限制等）
-- 增加全局异常处理（`@ControllerAdvice`）
-- 为关键操作加日志（新增/删除/登录等）
-
-### 第 4 周：进阶与项目包装
-
-目标：
-
-- 完成简历可展示的“学习型后端项目”
-- 形成可复用模板
-
-任务：
-
-- 增加简单鉴权（JWT 或 Session 二选一）
-- 增加接口文档（Swagger）
-- 补充 README：架构图、接口示例、踩坑记录
+1. 前端请求 `/api/students` 或 `/api/students/{id}`
+2. `StudentController` 调用 `StudentService`
+3. `StudentService` 调 `StudentMapper` 获取/修改数据
+4. Service 将 `Student` 转为 `StudentVO`
+5. Controller 用 `Result.success(data)` 返回
+6. 若抛出 `BusinessException`，由 `GlobalExceptionHandler` 统一返回错误
 
 ---
 
-## 6. 前端转 Java 的学习路线图（建议长期执行）
+## 5. 真实接口文档（与当前 Controller 对齐）
 
-### 阶段 A：后端入门（你当前阶段）
+> 当前项目已确认的接口来自 `StudentController`，基础路径为：`/api/students`
 
-- Java 语法 + Spring Boot CRUD + MySQL 基础
-- 关键词：**能开发接口，能连库，能排错**
-
-### 阶段 B：后端进阶
-
-- Spring MVC 深入、MyBatis/JPA、事务、缓存
-- 安全与权限（Spring Security / JWT）
-- 关键词：**接口稳定、结构清晰、具备可维护性**
-
-### 阶段 C：后端工程化
-
-- Redis、消息队列、Docker、Linux 部署
-- 单元测试、性能优化、监控告警
-- 关键词：**可上线、可扩展、可协作**
-
----
-
-## 7. API 接口文档（模板示例）
-
-> 以下为学习阶段的文档模板，可按你的实际 controller 路径调整。
-
-### 7.1 登录
-
-- **URL**: `/api/auth/login`
-- **Method**: `POST`
-- **Request Body**:
-
-```json
-{
-  "username": "admin",
-  "password": "123456"
-}
-```
-
-- **Response 示例**:
-
-```json
-{
-  "code": 0,
-  "message": "success",
-  "data": {
-    "token": "jwt-token-demo",
-    "expireAt": "2026-08-26T23:59:59"
-  }
-}
-```
-
----
-
-### 7.2 查询学生列表
+### 5.1 查询全部学生
 
 - **URL**: `/api/students`
 - **Method**: `GET`
-- **Query 参数**:
-  - `page` (int, 可选, 默认 1)
-  - `size` (int, 可选, 默认 10)
-  - `name` (string, 可选)
-
+- **Request**: 无
 - **Response 示例**:
 
 ```json
 {
-  "code": 0,
+  "code": 200,
+  "message": "success",
+  "data": [
+    {
+      "id": 1,
+      "studentNo": "S2026001",
+      "name": "张三",
+      "age": 20,
+      "gender": "M"
+    }
+  ]
+}
+```
+
+---
+
+### 5.2 查询学生详情
+
+- **URL**: `/api/students/{id}`
+- **Method**: `GET`
+- **Path 参数**:
+  - `id` (Long, 必填)
+- **Response 示例**:
+
+```json
+{
+  "code": 200,
   "message": "success",
   "data": {
-    "total": 2,
-    "records": [
-      {"id": 1, "name": "张三", "age": 20, "gender": "M"},
-      {"id": 2, "name": "李四", "age": 21, "gender": "F"}
-    ]
+    "id": 1,
+    "studentNo": "S2026001",
+    "name": "张三",
+    "age": 20,
+    "gender": "M"
   }
 }
 ```
 
 ---
 
-### 7.3 新增学生
+### 5.3 创建学生
 
 - **URL**: `/api/students`
 - **Method**: `POST`
-- **Request Body**:
+- **Request Body（对应 StudentCreateDTO）**:
 
 ```json
 {
-  "name": "王五",
+  "studentNo": "S2026002",
+  "name": "李四",
   "age": 19,
-  "gender": "M",
-  "grade": "大一"
+  "gender": "F"
 }
 ```
 
@@ -240,88 +158,189 @@ springboot-demo/
 
 ```json
 {
-  "code": 0,
-  "message": "created",
-  "data": {"id": 3}
+  "code": 200,
+  "message": "success",
+  "data": {
+    "id": 2,
+    "studentNo": "S2026002",
+    "name": "李四",
+    "age": 19,
+    "gender": "F"
+  }
 }
 ```
 
 ---
 
-### 7.4 更新学生
+### 5.4 修改学生
 
 - **URL**: `/api/students/{id}`
 - **Method**: `PUT`
 - **Path 参数**:
-  - `id` (long, 必填)
-- **Request Body**:
+  - `id` (Long, 必填)
+- **Request Body（对应 StudentUpdateDTO）**:
 
 ```json
 {
-  "name": "王五",
+  "studentNo": "S2026002",
+  "name": "李四-更新",
   "age": 20,
-  "grade": "大二"
+  "gender": "F"
+}
+```
+
+- **Response 示例**:
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "id": 2,
+    "studentNo": "S2026002",
+    "name": "李四-更新",
+    "age": 20,
+    "gender": "F"
+  }
 }
 ```
 
 ---
 
-### 7.5 删除学生
+### 5.5 删除学生
 
 - **URL**: `/api/students/{id}`
 - **Method**: `DELETE`
 - **Path 参数**:
-  - `id` (long, 必填)
+  - `id` (Long, 必填)
+- **Response 示例**:
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": null
+}
+```
 
 ---
 
-### 7.6 通用错误码建议
+### 5.6 错误响应（基于当前异常处理）
 
-- `0`：成功
-- `4001`：参数错误
-- `4004`：资源不存在
-- `5000`：服务器内部错误
-- `4010`：未授权/登录失效
+- `BusinessException`：返回 `Result.error(code, message)`（例如学生不存在）
+- 未知异常：返回
 
----
-
-## 8. 项目亮点（简历/面试可讲）
-
-- 从前端视角切入后端开发，完整实践了 API 到数据库的闭环。
-- 强化分层设计：Controller、Service、DAO/Mapper 职责清晰，便于维护。
-- 具备工程化意识：Maven、配置管理、SQL 脚本、README 文档化。
-- 可扩展性良好：可继续平滑扩展课程管理、成绩管理、用户权限模块。
+```json
+{
+  "code": 500,
+  "message": "系统异常",
+  "data": null
+}
+```
 
 ---
 
-## 9. 学习里程碑（可打卡）
+## 6. 本项目已覆盖的关键知识点
+
+- Spring Boot 启动与 REST 接口编写
+- DTO / Entity / VO 分离与对象转换
+- 统一响应结构设计（`Result<T>`）
+- 业务异常设计（`BusinessException`）
+- 全局异常处理（`GlobalExceptionHandler`）
+- 基于 Mapper 接口的数据访问组织方式
+
+---
+
+## 7. 如何运行（从 0 到可用）
+
+### 7.1 环境准备
+
+- JDK 17+（建议）
+- Maven（或直接使用仓库内 Maven Wrapper）
+
+### 7.2 启动命令
+
+```bash
+# Linux / macOS
+./mvnw spring-boot:run
+
+# Windows
+mvnw.cmd spring-boot:run
+```
+
+或：
+
+```bash
+./mvnw clean package
+java -jar target/*.jar
+```
+
+### 7.3 快速验证
+
+启动后请求：
+
+```bash
+curl http://localhost:8080/api/students
+```
+
+---
+
+## 8. 常见问题排查（学习期高频）
+
+### 8.1 端口占用
+
+现象：应用启动失败，提示端口被占用。  
+处理：修改 `application.properties` 里的 `server.port`，或结束占用进程。
+
+### 8.2 JDK 版本不匹配
+
+现象：编译报错（语法/字节码版本）。  
+处理：确认 `java -version` 与 `pom.xml` 配置一致。
+
+### 8.3 数据层空结果/空指针
+
+现象：查询返回空，或更新/删除报错。  
+处理：先检查 Mapper 实现与数据初始化，再核对 `id` 是否存在。
+
+---
+
+## 9. 项目亮点（简历/面试表达）
+
+- 以学生管理场景完整打通了从请求到数据层再到响应的后端闭环。
+- 使用 DTO/VO 分离和统一返回结构，具备基础可维护性与可读性。
+- 引入业务异常与全局异常处理，提升接口稳定性和前后端联调体验。
+- 作为前端转后端项目，体现了工程化和架构思维的迁移能力。
+
+---
+
+## 10. 学习里程碑（继续迭代）
 
 ### 7 天目标
 
-- [ ] 本地环境完全跑通
-- [ ] 跑通学生模块 CRUD
-- [ ] 明确分层职责并完成一次小重构
+- [ ] 完成所有接口本地联调
+- [ ] 给每个接口补充 Postman/Apifox 用例
+- [ ] 完成一次 Service 层重构（减少重复查找逻辑）
 
 ### 30 天目标
 
-- [ ] 增加 JWT 或 Session 登录鉴权
-- [ ] 接入 Swagger/OpenAPI
-- [ ] 增加全局异常处理 + 参数校验
-- [ ] 补充基础单元测试
-- [ ] 完成 Docker 本地部署
+- [ ] 增加参数校验注解（`@NotBlank` / `@NotNull`）
+- [ ] 接入 Swagger/OpenAPI 文档
+- [ ] 增加登录鉴权（JWT）
+- [ ] 增加单元测试与集成测试
+- [ ] Docker 化部署
 
 ---
 
-## 10. 开发规范（建议）
+## 11. 开发规范（建议）
 
-### 10.1 分支命名
+### 11.1 分支命名
 
 - `feature/*`：新功能
 - `fix/*`：Bug 修复
 - `docs/*`：文档变更
 - `refactor/*`：重构
 
-### 10.2 Commit 规范
+### 11.2 Commit 规范
 
 - `feat: ...`
 - `fix: ...`
@@ -331,11 +350,11 @@ springboot-demo/
 
 示例：
 
-- `feat: add student pagination api`
-- `fix: handle null pointer in login service`
-- `docs: update README learning roadmap`
+- `feat: add student detail endpoint`
+- `fix: handle student not found with business exception`
+- `docs: align README API docs with controller`
 
-### 10.3 学习记录规范
+### 11.3 学习记录规范
 
 建议新增目录：`weekly-log/`
 
@@ -346,26 +365,24 @@ springboot-demo/
 每周记录：
 
 1. 本周新增功能
-2. 本周遇到问题与排查过程
+2. 本周问题与排查过程
 3. 下周计划
 
 ---
 
-## 11. 本项目后续规划（Roadmap）
+## 12. 后续规划（Roadmap）
 
-- [ ] 补充真实接口清单（与 controller 代码保持一致）
-- [ ] 增加统一响应体与错误码枚举
-- [ ] 增加参数校验与全局异常处理
-- [ ] 接入 Swagger/OpenAPI 文档
-- [ ] 增加登录鉴权（JWT）
-- [ ] 增加分页/模糊搜索/批量导入导出
-- [ ] 增加单元测试与集成测试
-- [ ] Docker 化部署（本地一键启动）
+- [ ] 把当前内存式 `nextId` 逻辑替换为数据库自增 ID
+- [ ] 补齐 Mapper 对应的新增/修改/删除 SQL
+- [ ] 增加分页、条件筛选与排序
+- [ ] 增加课程管理、成绩管理模块
+- [ ] 增加角色权限（管理员/教师/学生）
+- [ ] 引入日志追踪与操作审计
 
 ---
 
-## 12. 你可以这样使用这个项目
+## 13. 你可以这样使用这个项目
 
-1. 先当“教程项目”：逐模块阅读 + 注释理解  
-2. 再当“实验项目”：每周做 1 次功能扩展  
-3. 最后当“作品项目”：完善文档后放进简历/面试项目集
+1. 当“教程项目”：逐层阅读 Controller → Service → Mapper 代码  
+2. 当“实验项目”：每周新增一个真实业务字段并做全链路改造  
+3. 当“作品项目”：完善文档 + 测试 + 部署后用于简历展示
