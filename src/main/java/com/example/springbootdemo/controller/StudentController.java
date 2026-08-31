@@ -82,6 +82,6 @@ public class StudentController {
 
         studentService.deleteStudent(id);
 
-        return Result.success();
+        return Result.success(null);
     }
 }

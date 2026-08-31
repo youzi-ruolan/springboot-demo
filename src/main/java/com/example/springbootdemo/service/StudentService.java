@@ -1,6 +1,4 @@
 package com.example.springbootdemo.service;
-
-
 import com.example.springbootdemo.dto.StudentCreateDTO;
 import com.example.springbootdemo.dto.StudentUpdateDTO;
 import com.example.springbootdemo.entity.Student;
@@ -15,7 +13,6 @@ import java.util.List;
 @Service
 public class StudentService {
     private final StudentMapper studentMapper;
-    private Long nextId = 1L;
 
     public StudentService(StudentMapper studentMapper) {
         this.studentMapper = studentMapper;
@@ -41,13 +38,12 @@ public class StudentService {
      */
 
     public StudentVO getStudentById(Long id){
-        List<Student> students = studentMapper.findAll();
-        for(Student student : students){
-            if(student.getId().equals(id)){
-                return  toVo(student);
-            }
+
+        Student student = studentMapper.findById(id);
+        if(student == null){
+            throw new BusinessException(404,"学生不存在");
         }
-        return  null;
+        return  toVo(student);
     }
 
     /**
@@ -55,29 +51,39 @@ public class StudentService {
      */
     public StudentVO createStudent(StudentCreateDTO dto){
         Student student = new Student();
-        List<Student> students = studentMapper.findAll();
-        student.setId(nextId ++);
+
         student.setGender(dto.getGender());
         student.setAge(dto.getAge());
         student.setName(dto.getName());
         student.setStudentNo(dto.getStudentNo());
-        students.add(student);
-        return toVo(student) ;
+
+        studentMapper.insert(student);
+
+        return toVo(student);
     }
 
     /**
      * 修改学生
      */
-    public StudentVO updateStudent(Long id, StudentUpdateDTO dto){
-        Student oldStudent = findStudentById(id);
-        if(oldStudent == null){
-            return null;
+    public StudentVO updateStudent(Long id, StudentUpdateDTO dto) {
+
+        Student student = studentMapper.findById(id);
+
+        if (student == null) {
+            throw new BusinessException(404, "学生不存在");
         }
-        oldStudent.setStudentNo(dto.getStudentNo());
-        oldStudent.setName(dto.getName());
-        oldStudent.setAge(dto.getAge());
-        oldStudent.setGender(dto.getGender());
-        return  toVo(oldStudent);
+
+        student.setName(dto.getName());
+        student.setAge(dto.getAge());
+        student.setGender(dto.getGender());
+
+        int rows = studentMapper.update(student);
+
+        if (rows != 1) {
+            throw new BusinessException(500, "修改学生失败");
+        }
+
+        return toVo(student);
     }
 
     /**
@@ -85,9 +91,16 @@ public class StudentService {
      */
 
     public void deleteStudent(Long id){
-        Student student = findStudentById(id);
-        List<Student> students = studentMapper.findAll();
-        students.remove(student);
+        Student student = studentMapper.findById(id);
+        if (student == null) {
+            throw new BusinessException(404, "学生不存在");
+        }
+
+        int rows = studentMapper.deleteById(id);
+
+        if (rows != 1) {
+            throw new BusinessException(500, "删除学生失败");
+        }
     }
 
     /**

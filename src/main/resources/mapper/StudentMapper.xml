@@ -22,7 +22,7 @@
 
     <select id="findById"
             parameterType="long"
-            resultType="com.example.springbootdemo.entity.Student">
+            resultType="Student">
 
         SELECT
         id,
@@ -34,5 +34,37 @@
         WHERE id = #{id}
 
     </select>
+    <insert id="insert"
+            parameterType="Student"
+            useGeneratedKeys="true"
+            keyProperty="id">
 
+        INSERT INTO student
+        (
+        student_no,
+        name,
+        age,
+        gender
+        )
+        VALUES
+        (
+        #{studentNo},
+        #{name},
+        #{age},
+        #{gender}
+        )
+
+    </insert>
+    <delete id="deleteById">
+        DELETE FROM student
+        WHERE id = #{id}
+    </delete>
+    <update id="update">
+        UPDATE student
+        SET
+        name = #{name},
+        age = #{age},
+        gender = #{gender}
+        WHERE id = #{id}
+    </update>
 </mapper>

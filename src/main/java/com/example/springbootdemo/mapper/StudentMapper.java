@@ -10,6 +10,8 @@ import java.util.List;
 public interface StudentMapper {
 
     List<Student> findAll();
-
     Student findById(Long id);
+    int insert(Student student);
+    int deleteById(Long id);
+    int update(Student student);
 }

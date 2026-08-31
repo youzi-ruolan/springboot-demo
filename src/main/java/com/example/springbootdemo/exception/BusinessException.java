@@ -8,5 +8,6 @@ public class BusinessException extends RuntimeException {
     }
     public Integer getCode (){
         return  code;
+
     }
 }
